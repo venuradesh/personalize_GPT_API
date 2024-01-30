@@ -1,0 +1,6 @@
+# Untrack the .env files
+.env
+*.env
+env/
+venv/
+/Database/credentials.json
