@@ -22,7 +22,7 @@ class UserService:
                 if(emailRetrived == email):
                     res = validate_password(doc.get('password'), password)
                     if(res): 
-                        return jsonify({"message": "user login successful", "error": False}), 200
+                        return jsonify({"message": "user login successful", "error": False, "user_id": doc.id, "choosed_llm": doc.get('choosed_llm')}), 200
                     else: 
                         return jsonify({"message": "incorrect password.", "error": True}),400
                 else:
@@ -30,3 +30,17 @@ class UserService:
 
         except Exception as e:
             return jsonify({"message": "error occured while login"}), 400
+        
+    def get_user_details_by_id(self, user_id):
+        try:
+            user_docs = self.db.collection("users").stream()
+            for doc in user_docs:
+                return jsonify({
+                    "first_name": doc.get('first_name'), 
+                    'last_name': doc.get('last_name'),
+                    'description': doc.get('description'), 
+                    'personality': doc.get('personality'),
+                    'designation': doc.get('designation')   
+                }), 200
+        except:
+            return jsonify({"message": "error occured while fetching data"}), 400

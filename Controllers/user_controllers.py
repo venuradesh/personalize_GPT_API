@@ -9,3 +9,6 @@ class UserControllers:
     
     def login_user(self, email, password):
         return self.user_service.login_user(email, password)
+    
+    def get_user_by_user_id(self, user_id):
+        return self.user_service.get_user_details_by_id(user_id)
