@@ -80,8 +80,7 @@ def login():
 
 @app.route("/get-greetings")
 def get_greetings():
-  # user_id = request.args.get("user_id")
-  user_id = "FZzO3AoDIfba24K8cWeu"
+  user_id = request.args.get("user_id")
   chain_responses = {}
   try:
     response, status_code = user_controllers.get_user_by_user_id(user_id)

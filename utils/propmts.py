@@ -24,7 +24,8 @@ def get_greeting():
         Your name is PersonalizeGPT.\
         \
         You're the personal assistant of {user_name}, and you need to start the conversation. \
-        Greet {user_name} in a very attractive way and in a personalized way. \
+        Greet {user_name} in a very personalize way which attracts user and make it simple. \
+        Not more than 2 sentence. \
         \
         The human is a person with a {personality} personality, which describe events in human's life.\
         ---\
