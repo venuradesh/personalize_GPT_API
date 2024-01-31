@@ -2,6 +2,7 @@ from langchain.chains import ConversationChain
 from langchain.chains import LLMChain
 from langchain.chat_models import ChatOpenAI
 from langchain_openai import ChatOpenAI
+from langchain.memory import ConversationBufferMemory
 
 def create_chain():
     # conv_memory = ConversationBufferMemory()
@@ -10,6 +11,7 @@ def create_chain():
     chatbot = ConversationChain(
         llm=GPT,
         verbose=True,
+        memory=ConversationBufferMemory()
     )
     return chatbot
 
