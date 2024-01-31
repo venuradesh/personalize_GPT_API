@@ -12,7 +12,7 @@ from Database.firebase import Firebase
 # importing Controllers
 from Controllers.user_controllers import UserControllers
 from Controllers.chat_controllers import ChatControllers
-from chatbots.retrieval import create_chain
+from chatbots.retrieval import create_chain, llm_chain
 # password_utils
 from utils.password_utils import hash_password
 from utils.propmts import chat_with_human, get_greeting
@@ -80,8 +80,7 @@ def login():
 
 @app.route("/get-greetings")
 def get_greetings():
-  # user_id = request.args.get("user_id")
-  user_id = "FZzO3AoDIfba24K8cWeu"
+  user_id = request.args.get("user_id")
   chain_responses = {}
   try:
     response, status_code = user_controllers.get_user_by_user_id(user_id)
@@ -123,9 +122,10 @@ def query():
       prompt = prompt_template.format(
         input=message,
         personality=response_json['first_name'],
-        user_description=response_json['first_name'],
-        user_name=response_json['first_name']
+        user_name=response_json['first_name'],
+        chat_history=chat_history
       )
+      # chain = llm_chain(prompt)
       chain_responses = {"data": chain.predict(input=prompt), "error": False}
       return jsonify(chain_responses), 200
       

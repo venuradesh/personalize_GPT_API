@@ -22,7 +22,7 @@ class UserService:
                 if(emailRetrived == email):
                     res = validate_password(doc.get('password'), password)
                     if(res): 
-                        return jsonify({"message": "user login successful", "error": False, "user_id": doc.id, "choosed_llm": doc.get('choosed_llm')}), 200
+                        return jsonify({"message": "user login successful", "error": False, "user_id": doc.id, "first_name": doc.get('first_name'), "last_name": doc.get('last_name'), "choosed_llm": doc.get('choosed_llm')}), 200
                     else: 
                         return jsonify({"message": "incorrect password.", "error": True}),400
                 else:
