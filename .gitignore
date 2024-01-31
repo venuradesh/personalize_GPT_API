@@ -3,4 +3,5 @@
 *.env
 env/
 venv/
+.venv/
 /Database/credentials.json
