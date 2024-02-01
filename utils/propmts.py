@@ -48,3 +48,24 @@ def get_greeting():
         {{{user_description}}}\
         ---\
     """
+
+def doc_prompt():
+    # return """
+    #     Your task is to answer the question based on the documents provided below.\
+    #     Try to answer the question by using the content provided by the vector store. \
+    #     If you cannot find any answer change the prompt to retrieve the required content from the vector store and always try to answer accurately.\
+    #     Do not create answers by your own. \
+    #     If the document does not contain the required result \
+    #     then simply write "I cannot find any answer within the document."\
+    #     ---\
+    #     document: {document_name}\
+    #     \
+    #     User question is: {query}\
+    #     \
+    #     Assistant answer: 
+    # """
+    return """
+        You're an assistant who has the knowlege about {document_name}. 
+        Try answer the questions asked by the user by referring all the documents that will provided by the vector store. 
+        User question is {query}
+    """
