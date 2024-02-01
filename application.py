@@ -12,10 +12,11 @@ from Database.firebase import Firebase
 # importing Controllers
 from Controllers.user_controllers import UserControllers
 from Controllers.chat_controllers import ChatControllers
-from chatbots.retrieval import create_chain, llm_chain
+from Controllers.doc_analyzer_controller import DocAnalyzerController
+from chatbots.retrieval import create_chain, conversational_chain, load_qa_chain, retrieval_chain
 # password_utils
 from utils.password_utils import hash_password
-from utils.propmts import chat_with_human, get_greeting
+from utils.propmts import chat_with_human, doc_prompt, get_greeting
 
 app = Flask(__name__)
 CORS(app=app, supports_credentials=True)
@@ -24,6 +25,8 @@ CORS(app=app, supports_credentials=True)
 db_ref = Firebase().dbRef()
 user_controllers = UserControllers(db_ref)
 chat_controllers = ChatControllers(db_ref)
+doc_analyzer_controller = DocAnalyzerController()
+global vector_store
 
 app.config["OPENAI_API_KEY"] = os.environ.get("OPENAI_API_KEY")
 app.config['LLAMA_API_KEY'] = os.environ.get("LLAMA_API_KEY")
@@ -135,6 +138,43 @@ def query():
   except Exception as e:
     return jsonify({"message": "Error occured while Fetching", "error": True}), 400
 
+
+@app.route("/analyze-doc", methods=["POST"])
+def analyze_doc():
+  data = request.form.to_dict()
+  file = request.files['file']
+  try:
+    text_chunks = doc_analyzer_controller.get_text_chunks(file)
+    global vector_store
+    vector_store = doc_analyzer_controller.get_vector_store(text_chunks)
+    return jsonify({"message": "successfully uploaded", "error": False}), 201
+
+  except Exception as e:
+    return jsonify({"message": "Error occured while analyzing the docs", "error": True}), 400
+  
+@app.route('/doc-query', methods=["POST"])
+def doc_query():
+  data = request.get_json()
+  query = data.get('query')
+  file_name = data.get('file_name')
+  try:
+    global vector_store
+    if vector_store:
+      docs = vector_store.similarity_search(query)      
+      # chain = load_qa_chain()
+      chain = retrieval_chain(vector_store.as_retriever(search_type="similarity", search_kwargs={"k":6}))
+      prompt_template = PromptTemplate.from_template(doc_prompt())
+      prompt = prompt_template.format(
+        document_name = file_name,
+        query = query
+      )
+      # response = chain.run(input_documents=docs, question=prompt)
+      response = chain({"query": prompt})
+      return jsonify({"data": response["result"], "error": False})
+    else:
+      return jsonify({"message": "Load the document first", "error": True}), 400
+  except Exception as e:
+    return jsonify({"message": "Error occured while processing the query", "error": e}), 400
 
 if __name__ == "__main__":
   load_dotenv(find_dotenv(), override=True);
