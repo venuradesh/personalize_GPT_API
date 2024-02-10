@@ -13,7 +13,7 @@ from Database.firebase import Firebase
 from Controllers.user_controllers import UserControllers
 from Controllers.chat_controllers import ChatControllers
 from Controllers.doc_analyzer_controller import DocAnalyzerController
-from chatbots.retrieval import create_chain, conversational_chain, load_qa_chain, retrieval_chain
+from chatbots.retrieval import create_chain, retrieval_chain, llama_chain
 # password_utils
 from utils.password_utils import hash_password
 from utils.propmts import chat_with_human, doc_prompt, get_greeting
@@ -47,7 +47,6 @@ def create_character():
     choosed_llm = data.get("choosed_llm")
     if data.get("openai_api_key"):
       openai_api_key = data.get("openai_api_key")
-      os.environ['OPENAI_API_KEY'] = openai_api_key
     else:
       openai_api_key = None
 
@@ -75,7 +74,7 @@ def login():
   try:
     email = data.get('email')
     password = data.get('password')
-    response, status_code = user_controllers.login_user(email, password)
+    response, status_code = user_controllers.login_user(email, password) # type: ignore
     return response, status_code
   except Exception as e:
     return jsonify({"message": "Error occured while Login", "error": e}), 400
@@ -86,23 +85,38 @@ def get_greetings():
   user_id = request.args.get("user_id")
   chain_responses = {}
   try:
-    response, status_code = user_controllers.get_user_by_user_id(user_id)
+    response, status_code = user_controllers.get_user_by_user_id(user_id) # type: ignore
     if status_code == 200:
-      chain = create_chain()
       response_json = response.get_json()
+      choosed_llm = response_json['choosed_llm']
       prompt_template = PromptTemplate.from_template(get_greeting())
       prompt = prompt_template.format(
         personality=response_json['first_name'],
         user_description=response_json['first_name'],
         user_name=response_json['first_name']
       )
+      if choosed_llm == 'openai':
+        chain = create_chain()
+      else:
+        chain = llama_chain()
       chain_responses = {"data": chain.predict(input=prompt), "error": False}
       return jsonify(chain_responses), 200
     else:
-      return jsonify({"message": "Error occured while Login", "error": e}), 400
+      return jsonify({"message": "Error occured while Login", "error": True}), 400
   except Exception as e:
     return jsonify({"message": "Error occured while Login", "error": e}), 400
 
+
+@app.route("/test", methods=["POST"])
+def test():
+  try:
+    chain = llama_chain()
+    response = chain.predict(input="greet venura warnasooriya as your chief, do not exceed over 50 words")
+    print(response)
+    return response
+  except Exception as e:
+    print(e)
+    return "Nothing"
   
 @app.route("/query", methods=["POST"])
 def query():
@@ -117,8 +131,7 @@ def query():
   message = data.get('message')
   chain_responses = {}
   try:
-    chain = create_chain()
-    response, status_code = user_controllers.get_user_by_user_id(user_id)
+    response, status_code = user_controllers.get_user_by_user_id(user_id) # type: ignore
     if status_code == 200:
       prompt_template = PromptTemplate.from_template(chat_with_human())
       response_json = response.get_json()
@@ -129,6 +142,10 @@ def query():
         chat_history=chat_history
       )
       # chain = llm_chain(prompt)
+      if(choosed_llm == 'openai'):
+        chain = create_chain()
+      else: 
+        chain = llama_chain()
       chain_responses = {"data": chain.predict(input=prompt), "error": False}
       return jsonify(chain_responses), 200
       
@@ -170,6 +187,7 @@ def doc_query():
       )
       # response = chain.run(input_documents=docs, question=prompt)
       response = chain({"query": prompt})
+      print(response["result"])
       return jsonify({"data": response["result"], "error": False})
     else:
       return jsonify({"message": "Load the document first", "error": True}), 400

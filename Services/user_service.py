@@ -40,7 +40,8 @@ class UserService:
                     'last_name': doc.get('last_name'),
                     'description': doc.get('description'), 
                     'personality': doc.get('personality'),
-                    'designation': doc.get('designation')   
+                    'designation': doc.get('designation'),  
+                    'choosed_llm': doc.get('choosed_llm')
                 }), 200
         except:
             return jsonify({"message": "error occured while fetching data"}), 400
