@@ -14,7 +14,7 @@ from langchain_experimental.llms import ChatLlamaAPI
 def create_chain():
     # conv_memory = ConversationBufferMemory()
     
-    GPT = ChatOpenAI(model_name="gpt-3.5-turbo")
+    GPT = ChatOpenAI(model_name="gpt-3.5-turbo") #type: ignore
     chatbot = ConversationChain(
         llm=GPT,
         verbose=True,
@@ -73,7 +73,7 @@ def retrieval_chain(retriever):
 #     return chain
 
 def llama_chain():
-    llama = LlamaAPI(os.environ.get("LLAMA_API_KEY"))
+    llama = LlamaAPI(os.environ.get("LLAMA_API_KEY"), hostname="https://api.llama-api.com")
     model = ChatLlamaAPI(client=llama)
 
     chatbot = ConversationChain(

@@ -35,13 +35,14 @@ class UserService:
         try:
             user_docs = self.db.collection("users").stream()
             for doc in user_docs:
-                return jsonify({
-                    "first_name": doc.get('first_name'), 
-                    'last_name': doc.get('last_name'),
-                    'description': doc.get('description'), 
-                    'personality': doc.get('personality'),
-                    'designation': doc.get('designation'),  
-                    'choosed_llm': doc.get('choosed_llm')
-                }), 200
+                if doc.id == user_id:
+                    return jsonify({
+                        "first_name": doc.get('first_name'), 
+                        'last_name': doc.get('last_name'),
+                        'description': doc.get('description'), 
+                        'personality': doc.get('personality'),
+                        'designation': doc.get('designation'),  
+                        'choosed_llm': doc.get('choosed_llm'),
+                    }), 200
         except:
             return jsonify({"message": "error occured while fetching data"}), 400

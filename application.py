@@ -91,8 +91,8 @@ def get_greetings():
       choosed_llm = response_json['choosed_llm']
       prompt_template = PromptTemplate.from_template(get_greeting())
       prompt = prompt_template.format(
-        personality=response_json['first_name'],
-        user_description=response_json['first_name'],
+        personality=response_json['personality'],
+        user_description=response_json['description'],
         user_name=response_json['first_name']
       )
       if choosed_llm == 'openai':
@@ -137,7 +137,7 @@ def query():
       response_json = response.get_json()
       prompt = prompt_template.format(
         input=message,
-        personality=response_json['first_name'],
+        personality=response_json['personality'],
         user_name=response_json['first_name'],
         chat_history=chat_history
       )
