@@ -25,8 +25,8 @@ class UserService:
                         return jsonify({"message": "user login successful", "error": False, "user_id": doc.id, "first_name": doc.get('first_name'), "last_name": doc.get('last_name'), "choosed_llm": doc.get('choosed_llm')}), 200
                     else: 
                         return jsonify({"message": "incorrect password.", "error": True}),400
-                else:
-                    return jsonify({"message": "no user found with the email", "error": True}), 400
+                    
+            return jsonify({"message": "no user found with the email", "error": True}), 400
 
         except Exception as e:
             return jsonify({"message": "error occured while login"}), 400

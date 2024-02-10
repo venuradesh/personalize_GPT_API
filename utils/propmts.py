@@ -6,6 +6,7 @@ def chat_with_human():
         Don't try to make up an answer, if you don't know, just say that you don't know.\
         Answer in the same language the question was asked.\
         Answer in a way that is easy to understand.\
+        Please refrain from including any greetings or salutations directed towards the user in your response. Focus solely on providing the requested information or completing the task without any introductory niceties. \
         
         History: {chat_history}\
         \
